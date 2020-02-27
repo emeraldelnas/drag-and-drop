@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Drag & Drop</title>
+    <style>
+        body {
+            color: #424242;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        #drop-area {
+            background-color: #edfdff;
+            width: 100%;
+            height: 20vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: dashed 1px #a9a9a9;
+            border-radius: 6px;
+        }
+
+        #drop-area .dbox_input {
+            display: flex;
+            flex-flow: column;
+            justify-content: center;
+            align-items: center;
+        }
+        #drop-area .dbox_file {
+            display: none;
+        }
+
+        .db-table-container {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+        }
+        table {
+            border-collapse: collapse !important;
+        }
+        th {
+            padding: .5rem 1rem .5rem .2rem;
+            background-color: #d4d4d4;
+            color: #06589e;
+            text-align: left;
+            border: solid 1px #d4d4d4;
+        }
+        td {
+            border: solid 1px #afafaf;
+            padding: .5rem 1rem .5rem .3rem;
+        }
+        
+        .hide {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="drop-area">
+        <form class="dbox" method="post" action="" enctype="multipart/form-data">
+            <div class="dbox_input">
+              <input class="dbox_file" type="file" name="file" id="file" onchange="handleFile()"/>
+              <label for="file"><strong>Choose a file</strong><span class="box__dragndrop"> or drag it here</span>.</label>
+            </div>
+        </form>
+    </div>
+    <div class="db-table-container hide">
+        <table id="db-table">
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email Address</th>
+                <th>Age</th>
+            </tr>
+            
+        </table>
+    </div>
+</body>
+
+<script>
+    
+let dropArea = document.getElementById('drop-area');
+
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(event => {
+    dropArea.addEventListener(event, preventDefaults, false);
+});
+
+let tableContainer = document.querySelector(".db-table-container");
+let table = document.getElementById("db-table");
+
+function preventDefaults (e) {
+    e.preventDefault()
+    e.stopPropagation()
+}
+
+dropArea.addEventListener('drop', handleDrop, false);
+
+function handleDrop(e) {
+    tableContainer.classList.remove('hide');
+
+    let dt = e.dataTransfer;
+    let file = dt.files[0];
+
+    handleFile(file);
+}
+
+function handleFile(file) {
+
+    let reader = new FileReader();
+    reader.onload = onReaderLoad;
+    reader.readAsText(file);
+}
+
+function onReaderLoad(e) {
+    let file = e.target.result;
+    let json = JSON.parse(file);
+
+    for (let i = 0; i < json.length; i++) {
+        let row = json[i];
+
+        appendNewRow(row);
+    }
+}
+
+
+
+function appendNewRow(row) {
+
+    let newRow = 
+    "<tr>" +
+        "<td>" + row.firstName + "</td>" +
+        "<td>" + row.lastName + "</td>" +
+        "<td>" + row.emailAddress + "</td>" +
+        "<td>" + row.age + "</td>" +
+    "</tr>";
+
+    table.innerHTML += newRow;
+}
+</script>
+
+</html>
